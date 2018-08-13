@@ -7977,24 +7977,3 @@ packages:
     sha256: 0b369366e9d413076cb0e93f8bbab3368c176f0e95b563eade4e491353376630
 name: lts-6.15
 compiler: ghc-7.10.3
-global-hints:
-  ghc: '7.10.3'
-  hoopl: '3.10.0.2'
-  bytestring: '0.10.6.0'
-  unix: '2.7.1.0'
-  base: '4.8.2.0'
-  time: '1.5.0.1'
-  hpc: '0.6.0.2'
-  filepath: '1.4.0.0'
-  process: '1.2.3.0'
-  array: '0.5.1.0'
-  integer-gmp: '1.0.0.0'
-  bin-package-db: '0.0.0.0'
-  containers: '0.5.6.2'
-  binary: '0.7.5.0'
-  ghc-prim: '0.4.0.0'
-  transformers: '0.4.2.0'
-  deepseq: '1.4.1.1'
-  pretty: '1.1.2.0'
-  template-haskell: '2.10.0.0'
-  directory: '1.2.2.0'
