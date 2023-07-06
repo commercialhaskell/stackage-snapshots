@@ -1,0 +1,35 @@
+cabal-version: 3.8
+name: stackage-history-chart
+version: 0
+license: MIT
+author: Andreas Abel
+
+executable stackage-history-chart
+  main-is: Main.hs
+  hs-source-dirs: src
+  build-depends:
+      Chart
+    , Chart-cairo
+    , aeson
+    , base
+    , bytestring
+    , colour >= 2.3.6
+    , containers
+    , data-default
+    , directory
+    , extra
+    , filepath
+    , lens
+    , mtl
+    , text
+    , time
+    , yaml
+  default-language:
+    GHC2021
+  default-extensions:
+    BlockArguments
+    DuplicateRecordFields
+    LambdaCase
+    PatternSynonyms
+    OverloadedRecordDot
+    OverloadedStrings
