@@ -26,10 +26,9 @@
 -- However, we can also use the (slower) proper YAML parser.
 --
 
+-- imports from standard libraries
 import Control.Monad
   ( guard )
-import Control.Monad.Extra
-  ( fromMaybeM, unlessM )
 import Control.Monad.Except
   ( MonadError(..), ExceptT, runExceptT )
 import Control.Monad.IO.Class
@@ -59,8 +58,6 @@ import Data.Text
   ( Text )
 import Data.Traversable
   ( forM )
-import Data.Yaml
-  ( (.:), (.:?), FromJSON(..), pattern Object, decodeThrow )
 import System.Directory
   ( doesDirectoryExist, getCurrentDirectory, listDirectory )
 import System.Exit
@@ -69,6 +66,14 @@ import System.FilePath
   ( (</>), (<.>), dropExtension )
 import Text.Read
   ( readMaybe )
+
+-- extra
+import Control.Monad.Extra
+  ( fromMaybeM, unlessM )
+
+-- yaml
+import Data.Yaml
+  ( (.:), (.:?), FromJSON(..), pattern Object, decodeThrow )
 
 -- time
 import Data.Time.Clock
@@ -219,8 +224,8 @@ runM m = runExceptT (unM m) >>= \case
 main :: IO ()
 main = do
   putStrLn "stackage-history-chart (C) Andreas Abel 2023"
-  -- putStrLn =<< getCurrentDirectory
 
+  putStrLn "Parsing latest snapshots"
   -- Get LTS snapshots (latest major versions).
   ltss <- runM latestLTSs
   -- mapM_ putStrLn ltss
@@ -329,7 +334,7 @@ main = do
 reportSnapshot :: String -> Snapshot -> IO ()
 reportSnapshot name snapshot = do
   putStrLn $ unwords $ concat
-    [ [ name ]
+    [ [ "-", name ]
     , maybe [] (\ ghc -> [ "for GHC", printGHC ghc ]) $ snapshotGHC snapshot
     , [ "has", show $ length $ snapshotPackages snapshot, "packages" ]
     ]
