@@ -34,12 +34,10 @@ import Control.Monad.Except
 import Control.Monad.IO.Class
   ( MonadIO, liftIO )
 import Data.Bifunctor
-  ( first, second )
+  ( second )
 import Data.ByteString qualified as BS
 import Data.Char
   ( isDigit )
-import Data.Foldable
-  ( forM_ )
 import Data.Functor
   ( (<&>) )
 import Data.List
@@ -50,16 +48,13 @@ import Data.Map
 import Data.Maybe
   ( catMaybes, listToMaybe, mapMaybe )
 import Data.Set qualified as Set
-import Data.Set
-  ( Set )
 import Data.Text    qualified as Text
-import Data.Text.IO qualified as Text
 import Data.Text
   ( Text )
 import Data.Traversable
   ( forM )
 import System.Directory
-  ( doesDirectoryExist, getCurrentDirectory, listDirectory )
+  ( doesDirectoryExist, listDirectory )
 import System.Exit
   ( die )
 import System.FilePath
@@ -93,16 +88,29 @@ import Data.Colour.SRGB
 
 -- Chart and Chart-cairo
 import Graphics.Rendering.Chart
-  ( Layout
-  , pattern AxisVisibility
-  , pattern BarsFixGap, pattern BarsStacked, pattern FillStyleSolid, pattern LORows
-  , laxis_generate
-  , layout_bottom_axis_visibility, layout_legend, layout_plots, layout_title, layout_y_axis
-  , layoutToRenderable
-  , legend_orientation
-  , plot_bars_item_styles, plot_bars_spacing, plot_bars_style, plot_bars_titles, plot_bars_values
-  , plotBars
-  , scaledAxis
+  ( Layout,
+    PlotIndex,
+    addIndexes,
+    autoIndexAxis,
+    laxis_generate,
+    layoutToRenderable,
+    layout_bottom_axis_visibility,
+    layout_legend,
+    layout_plots,
+    layout_title,
+    layout_x_axis,
+    legend_orientation,
+    plotBars,
+    plot_bars_item_styles,
+    plot_bars_spacing,
+    plot_bars_style,
+    plot_bars_titles,
+    plot_bars_values,
+    pattern AxisVisibility,
+    pattern BarsFixGap,
+    pattern BarsStacked,
+    pattern FillStyleSolid,
+    pattern LORows,
   )
 import Graphics.Rendering.Chart.Backend.Cairo
   ( pattern FileOptions, pattern PDF, pattern SVG
@@ -259,11 +267,6 @@ main = do
     ghcToPackages :: [(GHC, [Package])]
     ghcToPackages = Map.toList $ fmap snapshotPackages ghcToSnapshot
 
-  -- Maximum number of packages in snapshot.
-  let
-    maxPackages :: Int
-    maxPackages = maximum $ map (length . snd) ghcToPackages
-
   -- Map each package to its minium GHC version.
   let
     pkgToMin :: Map Package GHC
@@ -290,11 +293,8 @@ main = do
     ghcs :: [String]
     ghcs = map (printGHC . fst) pkgMaps
 
-    vals :: [(Double, [Int])]
-    vals = map (first ghcToDouble) pkgMaps
-
-    valsDouble :: [(Double, [Double])]
-    valsDouble = map (second (map fromIntegral)) vals
+    vals :: [[Int]]
+    vals = map snd pkgMaps
 
     nBars = length ghcs
 
@@ -302,21 +302,16 @@ main = do
          $ plot_bars_style       .~ BarsStacked
          $ plot_bars_spacing     .~ BarsFixGap 0 0
          $ plot_bars_item_styles .~ map (\ c -> (FillStyleSolid c, Just def)) colors
-         $ plot_bars_values      .~ valsDouble
+         $ plot_bars_values      .~ addIndexes vals
          $ def
 
-    maxHeight :: Double
-    maxHeight = fromIntegral maxPackages
-
-    layout :: Layout Double Double
+    layout :: Layout PlotIndex Int
     layout = layout_title  .~ ("Stackage LTS packages by age in terms of GHC version as of " ++ today)
            $ layout_legend .~ Just (legend_orientation .~ LORows nBars $ def)
+           $ layout_x_axis . laxis_generate .~ autoIndexAxis ghcs
            $ layout_plots  .~ [ plotBars bars ]
-           $ layout_bottom_axis_visibility  .~ AxisVisibility True False False  -- only line, no numbers
-           -- $ layout_left_axis_visibility    .~ AxisVisibility True False False  -- off
-           -- $ layout_right_axis_visibility   .~ def                              -- on
-           $ layout_y_axis . laxis_generate .~ scaledAxis def (0, maxHeight)         -- scaledAxis forces Double values
-           $ def -- :: Layout1 LocalTime Double
+           $ layout_bottom_axis_visibility  .~ AxisVisibility True False True  -- only line, no numbers
+           $ def
 
   let
     renderable = layoutToRenderable layout
@@ -404,16 +399,6 @@ latestLTSs = do
     -- @lts/21/1@
     minor <- fromMaybeM (throwError $ NoLTSMinor major) $ maxNumericEntry ltsMajor
     return $ LTS major minor
-
--- * Chart preparation
-
--- | Scale to unit interval
-ghcToDouble :: GHC -> Double
-ghcToDouble g = fromIntegral (ghcToInt g) / 22
-
--- | 7.8--9.4 yields 1--21
-ghcToInt :: GHC -> Int
-ghcToInt (GHC major minor) = ((major - 7) * 12 + minor - 8) + 1 -- `div` 2
 
 -- * Utilities
 
