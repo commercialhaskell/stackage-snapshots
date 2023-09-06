@@ -1,4 +1,4 @@
-resolver: lts-21.1
+resolver: lts-21.9
 
 packages:
 - stackage-history-chart

@@ -11,18 +11,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Setup Haskell
-      run: cabal update
-
-    - uses: actions/cache@v3
-      with:
-        path: ~/.cabal/store
-        key: deploy-chart-${{ github.sha }}
-        restore-keys: deploy-chart-
-
     - name: Create chart
       run: |
-        cabal run stackage-history-chart
+        stack run
         cp -f chart*.svg html/chart.svg
 
     - uses: actions/upload-pages-artifact@v1

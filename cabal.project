@@ -1,4 +1,0 @@
-packages:
-  stackage-history-chart
-
-with-compiler: ghc-9.4.7
