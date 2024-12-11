@@ -11,6 +11,11 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Install libraries
+      run: |
+          sudo apt-get update
+          sudo apt-get install libcairo2-dev
+
     - name: Create chart
       run: |
         stack run
