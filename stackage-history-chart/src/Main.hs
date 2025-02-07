@@ -129,30 +129,12 @@ nightlyPath = "nightly"
 
 -- | Size of generated images.
 dim :: (Int, Int)
-dim = (800, 600)
+dim = (850, 600)
 
--- | Palette to color blocks in chart.
+-- | Palette generated via <https://gka.github.io/palettes/#/15|d|488f31,ffe692|ffe692,de425b|1|1>
 colors :: [AlphaColour Double]
-colors = colors_divergent_13
-
--- | Palette generated at <https://www.learnui.design/tools/data-color-picker.html#divergent>
--- with maximal color intensity.
-colors_divergent_13 :: [AlphaColour Double]
-colors_divergent_13 = map opaque $ cycle $ map sRGB24read $ reverse $
-  "#00876c" :
-  "#3d9a70" :
-  "#64ad73" :
-  "#89bf77" :
-  "#afd17c" :
-  "#d6e184" :
-  "#fff18f" :
-  "#fdd576" :
-  "#fbb862" :
-  "#f59b56" :
-  "#ee7d4f" :
-  "#e35e4e" :
-  "#d43d51" :
-  []
+colors = map opaque $ cycle $ map sRGB24read $ reverse $
+  ["#488f31", "#649c3f", "#7fa84c", "#98b55a", "#b2c167", "#cbcd75", "#e5da84", "#ffe692", "#fcd18a", "#f9bb82", "#f5a57a", "#f08f72", "#eb786a", "#e55f63", "#de425b"]
 
 -- * Types
 
